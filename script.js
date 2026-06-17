@@ -1,172 +1,276 @@
-// ==========================
-// PRODUTO RECEBIDO
-// ==========================
+const API_URL = "http://localhost:8081/v1/vibecoffee/produto";
 
-const produtoAtual = {
-    nome: "Cappuccino Clássico",
+// =====================================
+// PEGA O ID DA URL
+// view.html?id=1
+// =====================================
 
-    descricao:
-        "Café expresso intenso, leite vaporizado e espuma cremosa. Simples, clássico e irresistível.",
+const params = new URLSearchParams(window.location.search);
+const idProduto = Number(params.get("id"));
 
-    preco: 14.90,
+// =====================================
+// CARREGA PRODUTO
+// =====================================
 
-    imagem: "img/cappuccino.jpg",
+async function carregarProduto() {
 
-    disponivel: true,
+    try {
 
-};
+        const response = await fetch(API_URL);
 
-// ==========================
-// VARIÁVEIS
-// ==========================
+        if (!response.ok) {
+            throw new Error("Erro ao buscar produtos.");
+        }
 
-let basePrice = produtoAtual.preco;
+        const dados = await response.json();
 
-// ==========================
-// CARREGAR PRODUTO
-// ==========================
+        const produtos = dados.response.produto;
 
-function carregarProduto(produto) {
+        const produto = produtos.find(
+            item => item.id === idProduto
+        );
 
-    document.getElementById("productTitle").innerHTML =
-        produto.nome.replace(" ", "<br>");
+        if (!produto) {
+            console.error("Produto não encontrado.");
+            return;
+        }
 
-    document.getElementById("productDesc").textContent =
-        produto.descricao;
+        preencherTela(produto);
 
-    document.getElementById("unitPrice").textContent =
-        formatBRL(produto.preco);
+    } catch (erro) {
 
-    const imagem =
-        document.getElementById("mainImg");
+        console.error(
+            "Erro ao carregar produto:",
+            erro
+        );
 
-    imagem.src = produto.imagem;
-
-    imagem.style.display = "block";
-
-    const placeholder =
-        document.getElementById("imgPlaceholder");
-
-    if (placeholder) {
-        placeholder.style.display = "none";
     }
 
-    const tags =
-        document.getElementById("productTags");
-
-    tags.innerHTML = "";
-
-    produto.tags.forEach(tag => {
-
-        const span =
-            document.createElement("span");
-
-        span.classList.add("tag");
-
-        span.textContent = tag;
-
-        tags.appendChild(span);
-
-    });
-
-    atualizarStatus(produto.disponivel);
-
-    basePrice = produto.preco;
-
-    updateTotal();
 }
 
-// ==========================
-// STATUS
-// ==========================
+// =====================================
+// PREENCHE A TELA
+// =====================================
 
-function atualizarStatus(disponivel) {
+function preencherTela(produto) {
+
+    // TÍTULO
+
+    const titulo =
+        document.querySelector(".product-title");
+
+    if (titulo) {
+        titulo.innerHTML =
+            produto.nome.replace(" ", "<br>");
+    }
+
+    // DESCRIÇÃO
+
+    const descricao =
+        document.querySelector(".product-desc");
+
+    if (descricao) {
+        descricao.textContent =
+            produto.descricao;
+    }
+
+    // PREÇO
+
+    const preco =
+        produto.tipo_categoria[0].preco;
+
+    const precoElemento =
+        document.getElementById("unitPrice");
+
+    if (precoElemento) {
+
+        precoElemento.textContent =
+            Number(preco).toLocaleString(
+                "pt-BR",
+                {
+                    style: "currency",
+                    currency: "BRL"
+                }
+            );
+
+    }
+
+    // STATUS
+
+    atualizarStatus(produto.status);
+
+    // TIPO (quente ou gelado)
+
+    configurarTipo(
+        produto.tipo_categoria[0].id_tipo
+    );
+
+    // FOTO
+
+    carregarImagem(produto.foto);
+
+}
+
+// =====================================
+// STATUS
+// =====================================
+
+function atualizarStatus(status) {
+
+    const dot =
+        document.getElementById("statusDot");
 
     const texto =
         document.getElementById("statusText");
 
-    const bolinha =
-        document.getElementById("statusDot");
+    if (!dot || !texto) return;
 
-    if (disponivel) {
+    if (status == 1) {
 
-        texto.textContent = "Disponível";
+        dot.className =
+            "status-dot available";
 
         texto.className =
             "status-label available";
 
-        bolinha.className =
-            "status-dot available";
+        texto.textContent =
+            "Disponível";
 
     } else {
 
-        texto.textContent = "Indisponível";
+        dot.className =
+            "status-dot unavailable";
 
         texto.className =
             "status-label unavailable";
 
-        bolinha.className =
-            "status-dot unavailable";
+        texto.textContent =
+            "Indisponível";
+
     }
+
 }
 
-// ==========================
-// FORMATAR PREÇO
-// ==========================
+// =====================================
+// TIPO
+// 1 = QUENTE
+// 2 = GELADO
+// =====================================
 
-function formatBRL(valor) {
+function configurarTipo(idTipo) {
 
-    return "R$ " +
-        valor.toFixed(2)
-        .replace(".", ",");
+    const quente =
+        document.getElementById("btnQuente");
+
+    const gelado =
+        document.getElementById("btnGelado");
+
+    if (!quente || !gelado) return;
+
+    quente.classList.remove("active");
+    gelado.classList.remove("active");
+
+    if (idTipo == 1) {
+
+        quente.classList.add("active");
+
+    } else if (idTipo == 2) {
+
+        gelado.classList.add("active");
+
+    }
+
 }
 
-// ==========================
-// TEMPERATURA
-// ==========================
+// =====================================
+// IMAGEM
+// =====================================
+
+function carregarImagem(nomeArquivo) {
+
+    const imagem =
+        document.getElementById("mainImg");
+
+    const placeholder =
+        document.getElementById("imgPlaceholder");
+
+    if (!imagem) return;
+
+    /*
+       Ajuste esta pasta conforme
+       a estrutura do seu projeto
+    */
+
+    imagem.src =
+        `img/${nomeArquivo}`;
+
+    imagem.style.display =
+        "block";
+
+    if (placeholder) {
+        placeholder.style.display =
+            "none";
+    }
+
+}
+
+// =====================================
+// BOTÕES MANUAIS
+// =====================================
 
 function selectTemp(temp) {
 
-    document
-        .getElementById("btnQuente")
-        .classList.toggle(
-            "active",
-            temp === "quente"
-        );
+    const quente =
+        document.getElementById("btnQuente");
 
-    document
-        .getElementById("btnGelado")
-        .classList.toggle(
-            "active",
-            temp === "gelado"
-        );
+    const gelado =
+        document.getElementById("btnGelado");
+
+    quente.classList.toggle(
+        "active",
+        temp === "quente"
+    );
+
+    gelado.classList.toggle(
+        "active",
+        temp === "gelado"
+    );
+
 }
 
-// ==========================
+// =====================================
 // THUMBNAILS
-// ==========================
+// =====================================
 
-const thumbs =
-    document.querySelectorAll(".thumb");
+document
+.querySelectorAll(".thumb")
+.forEach(thumb => {
 
-thumbs.forEach(thumb => {
+    thumb.addEventListener(
+        "click",
+        () => {
 
-    thumb.addEventListener("click", () => {
+            document
+            .querySelectorAll(".thumb")
+            .forEach(item => {
 
-        thumbs.forEach(item => {
+                item.classList.remove(
+                    "active"
+                );
 
-            item.classList.remove("active");
+            });
 
-        });
+            thumb.classList.add(
+                "active"
+            );
 
-        thumb.classList.add("active");
-
-    });
+        }
+    );
 
 });
 
-// ==========================
-// INICIALIZAÇÃO
-// ==========================
+// =====================================
+// INICIAR
+// =====================================
 
-carregarProduto(produtoAtual);
+carregarProduto();
