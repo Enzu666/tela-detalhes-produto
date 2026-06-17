@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Vibe Coffee — Cappuccino Classico</title>
+  
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+  
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  </head>
+<body>
+
+<div class="page">
+
+  <header>
+    <div class="cabecalho-principal">
+
+        <img src="img/logo (1).png" alt="logo vibe coffee">
+
+        <ul>
+            <li><a href="#">HOME</a></li>
+            <li><a href="#">CARDÁPIO</a></li>
+            <li><a href="#">SOBRE</a></li>
+            <li><a href="#">CONTATO</a></li>
+        </ul>
+
+        <div class="desde-1980">
+            <img src="img/icone de café.png" alt="">
+            <p>DESDE 1980</p>
+        </div>
+
+    </div>
+</header>
+
+  <!-- PRODUCT -->
+  <div class="product">
+
+    <!-- LEFT: image -->
+    <div class="img-col">
+      <div class="img-wrap" id="imgWrap">
+        <img id="mainImg" src="" alt="Produto"/>
+        <div class="img-placeholder" id="imgPlaceholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <span>Imagem do produto</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: info -->
+    <div class="info-col">
+      <h1 class="product-title" id="productTitle"></h1>
+      <div class="divider"></div>
+
+      <p class="product-desc" id="productDesc"></p>
+
+      <div class="status-row">
+        <span>Produto:</span>
+        <div class="status-dot available" id="statusDot"></div>
+        <span class="status-label available" id="statusText">disponível</span>
+      </div>
+
+      <p class="price" id="unitPrice"></p>
+
+      <div class="temp-row">
+        <button class="temp-btn active" id="btnQuente" onclick="selectTemp('quente')">
+          ☕ Café quente
+        </button>
+        <button class="temp-btn" id="btnGelado" onclick="selectTemp('gelado')">
+          🧊 Café gelado
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .page -->
+
+<script src="produto.js"></script>
+</body>
+</html>
